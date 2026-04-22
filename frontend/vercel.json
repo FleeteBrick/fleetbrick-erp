@@ -1,12 +1,12 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": "nextjs",
+  "github": {
+    "silent": true
+  },
   "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
-    }
+    { "src": "package.json", "use": "@vercel/next" }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

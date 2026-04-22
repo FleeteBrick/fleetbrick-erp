@@ -1,14 +1,8 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '@/types/database'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 export const createClient = () => {
-  return createClientComponentClient<Database>()
-}
-
-export const getServiceRoleClient = () => {
-  // Usar apenas no servidor (Server Components/Actions)
-  return createClientComponentClient<Database>({
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    supabaseKey: process.env.SUPABASE_SERVICE_KEY!
-  })
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 }

@@ -58,11 +58,11 @@ export function usePlanLimits() {
       ])
 
       setLimits({
-        nome: empresa.planos.nome,
-        preco: empresa.planos.preco,
-        max_veiculos: empresa.planos.max_veiculos,
-        max_imoveis: empresa.planos.max_imoveis,
-        max_usuarios: empresa.planos.max_usuarios,
+        nome: (empresa.planos as any)?.nome || '',
+        preco: (empresa.planos as any)?.preco || 0,
+        max_veiculos: (empresa.planos as any)?.max_veiculos || 0,
+        max_imoveis: (empresa.planos as any)?.max_imoveis || 0,
+        max_usuarios: (empresa.planos as any)?.max_usuarios || 0,
         veiculos_usados: veiculos || 0,
         imoveis_usados: imoveis || 0,
         usuarios_usados: usuarios || 0,

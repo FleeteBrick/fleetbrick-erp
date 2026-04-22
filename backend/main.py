@@ -1,9 +1,9 @@
+"""Fleet&Brick ERP - FastAPI Application"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.routers import veiculos, tickets
-import asyncio
+from app.routers import veiculos, propriedades, webhooks, support, contratos, pagamentos
 
 
 @asynccontextmanager
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Fleet&Brick ERP API",
-    description="API unificada para gestão de frotas e imobiliária",
+    description="API unificada para gestão de frotas e imóveis",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -28,8 +28,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(veiculos.router, prefix="/api", tags=["Veículos"])
-app.include_router(tickets.router, prefix="/api", tags=["Suporte"])
+app.include_router(veiculos.router)
+app.include_router(propriedades.router)
+app.include_router(contratos.router)
+app.include_router(pagamentos.router)
+app.include_router(support.router)
+app.include_router(webhooks.router)
 
 
 @app.get("/health")
