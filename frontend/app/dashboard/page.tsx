@@ -48,10 +48,11 @@ export default function DashboardPage() {
     if (!usuario) return
     const empresa_id = usuario.empresa_id
 
-    const [{ data: empresa }, { data: propriedades }, { data: veiculos }] = await Promise.all([
-      supabase.from('empresas').select('planos(*)').eq('id', empresa_id).single(),
+    const [{ data: empresa }, { data: propriedades }, { data: veiculos }, { data: plano }] = await Promise.all([
+      supabase.from('empresas').select('plano_id').eq('id', empresa_id).single(),
       supabase.from('propriedades').select('*').eq('empresa_id', empresa_id),
-      supabase.from('veiculos').select('*').eq('empresa_id', empresa_id)
+      supabase.from('veiculos').select('*').eq('empresa_id', empresa_id),
+      supabase.from('planos').select('*').eq('id', empresa?.plano_id).single()
     ])
 
     const propsOcupadas = propriedades?.filter(p => p.status === 'alugado').length || 0
@@ -63,7 +64,7 @@ export default function DashboardPage() {
       veiculos_rota: veiculosRota,
       veiculos_totais: veiculos?.length || 0,
       receita_mensal: propsOcupadas * 1500,
-      plano: empresa?.planos || { nome: '', max_veiculos: 0, max_imoveis: 0 }
+      plano: plano || { nome: 'Starter', max_veiculos: 5, max_imoveis: 10 }
     })
     setLoading(false)
   }
@@ -163,19 +164,19 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="font-bold text-gray-900 mb-4">Ações Rápidas</h3>
             <div className="grid grid-cols-2 gap-3">
-              <a href="/app/propriedades" className="border rounded-lg p-4 text-center hover:bg-gray-50">
+              <a href="/propriedades" className="border rounded-lg p-4 text-center hover:bg-gray-50">
                 <p className="text-2xl mb-1">🏢</p>
                 <p className="text-sm">Imóveis</p>
               </a>
-              <a href="/app/veiculos" className="border rounded-lg p-4 text-center hover:bg-gray-50">
+              <a href="/veiculos" className="border rounded-lg p-4 text-center hover:bg-gray-50">
                 <p className="text-2xl mb-1">🚛</p>
                 <p className="text-sm">Veículos</p>
               </a>
-              <a href="/app/contratos" className="border rounded-lg p-4 text-center hover:bg-gray-50">
+              <a href="/contratos" className="border rounded-lg p-4 text-center hover:bg-gray-50">
                 <p className="text-2xl mb-1">📄</p>
                 <p className="text-sm">Contratos</p>
               </a>
-              <a href="/app/manutencoes" className="border rounded-lg p-4 text-center hover:bg-gray-50">
+              <a href="/manutencoes" className="border rounded-lg p-4 text-center hover:bg-gray-50">
                 <p className="text-2xl mb-1">🔧</p>
                 <p className="text-sm">Manutenção</p>
               </a>

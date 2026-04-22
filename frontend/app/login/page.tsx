@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [modo, setModo] = useState<'login' | 'cadastro'>('login')
-  const [nome, setNome] = useState('')
+  const [empresaNome, setEmpresaNome] = useState('')
   const supabase = createClient()
   const router = useRouter()
 
@@ -25,17 +25,42 @@ export default function LoginPage() {
   }
 
   async function handleCadastro() {
+    if (!empresaNome) {
+      alert('Digite o nome da empresa')
+      return
+    }
     setLoading(true)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { nome } }
+      options: { data: { nome: empresaNome } }
     })
     if (error) {
       alert(error.message)
-    } else {
-      alert('Cadastro realizado! Verifique seu email para confirmar.')
+      setLoading(false)
+      return
     }
+    const user = data.user
+    if (user) {
+      const { data: plano } = await supabase.from('planos').select('id').eq('slug', 'starter').single()
+      const { data: empresa } = await supabase.from('empresas').insert({
+        nome: empresaNome,
+        email,
+        plano_id: plano?.id,
+        status_assinatura: 'trial'
+      }).select().single()
+      if (empresa) {
+        await supabase.from('usuarios').insert({
+          id: user.id,
+          email,
+          nome: empresaNome,
+          empresa_id: empresa.id,
+          role: 'admin'
+        })
+      }
+    }
+    alert('Cadastro realizado! Faça login para continuar.')
+    setModo('login')
     setLoading(false)
   }
 
@@ -64,13 +89,13 @@ export default function LoginPage() {
 
         {modo === 'cadastro' && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa</label>
             <input
               type="text"
-              value={nome}
-              onChange={e => setNome(e.target.value)}
+              value={empresaNome}
+              onChange={e => setEmpresaNome(e.target.value)}
               className="w-full border rounded-lg px-4 py-3"
-              placeholder="Seu nome"
+              placeholder="Minha Empresa"
             />
           </div>
         )}

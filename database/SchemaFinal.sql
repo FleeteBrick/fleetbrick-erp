@@ -124,6 +124,16 @@ CREATE TABLE IF NOT EXISTS chamados_suporte (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    nome VARCHAR(255),
+    empresa_id UUID REFERENCES empresas(id),
+    role VARCHAR(50) DEFAULT 'admin',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 3. Seed - Dados Iniciais
 INSERT INTO planos (nome, slug, preco, max_veiculos, max_imoveis, max_usuarios) VALUES
 ('Starter', 'starter', 197.00, 5, 10, 3),
