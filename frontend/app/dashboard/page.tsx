@@ -45,15 +45,20 @@ export default function DashboardPage() {
       .eq('id', user.id)
       .single()
 
-    if (!usuario) return
-    const empresa_id = usuario.empresa_id
-
-    const [{ data: empresa }, { data: propriedades }, { data: veiculos }, { data: plano }] = await Promise.all([
-      supabase.from('empresas').select('plano_id').eq('id', empresa_id).single(),
-      supabase.from('propriedades').select('*').eq('empresa_id', empresa_id),
-      supabase.from('veiculos').select('*').eq('empresa_id', empresa_id),
-      supabase.from('planos').select('*').eq('id', empresa?.plano_id).single()
-    ])
+    if (!usuario?.empresa_id) {
+      setLoading(false)
+      return
+    }
+    
+    const { data: emp } = await supabase.from('empresas').select('plano_id').eq('id', usuario.empresa_id).single()
+    const { data: propriedades } = await supabase.from('propriedades').select('*').eq('empresa_id', usuario.empresa_id)
+    const { data: veiculos } = await supabase.from('veiculos').select('*').eq('empresa_id', usuario.empresa_id)
+    
+    let plano = { nome: 'Starter', max_veiculos: 5, max_imoveis: 10 }
+    if (emp?.plano_id) {
+      const { data: p } = await supabase.from('planos').select('*').eq('id', emp.plano_id).single()
+      if (p) plano = p
+    }
 
     const propsOcupadas = propriedades?.filter(p => p.status === 'alugado').length || 0
     const veiculosRota = veiculos?.filter(v => v.status === 'em_rota').length || 0

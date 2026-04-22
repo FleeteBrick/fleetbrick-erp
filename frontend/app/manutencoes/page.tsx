@@ -29,11 +29,11 @@ export default function ManutencoesPage() {
 
   async function carregarDados() {
     if (!user) return
-    const [{ data: usuario }, { data: manutData }, { data: veiculosData }] = await Promise.all([
-      supabase.from('usuarios').select('empresa_id').eq('id', user.id).single(),
-      supabase.from('manutencoes').select('*, veiculos(placa)').eq('empresa_id', (await supabase.from('usuarios').select('empresa_id').eq('id', user.id).single()).data?.[0]?.empresa_id || ''),
-      supabase.from('veiculos').select('id, placa').eq('empresa_id', (await supabase.from('usuarios').select('empresa_id').eq('id', user.id).single()).data?.[0]?.empresa_id || '')
-    ])
+    const { data: usuario } = await supabase.from('usuarios').select('empresa_id').eq('id', user.id).single()
+    if (!usuario?.empresa_id) { setLoading(false); return }
+    
+    const { data: manutData } = await supabase.from('manutencoes').select('*, veiculos(placa)').eq('empresa_id', usuario.empresa_id)
+    const { data: veiculosData } = await supabase.from('veiculos').select('id, placa').eq('empresa_id', usuario.empresa_id)
     setManutencoes(manutData?.filter(m => m.veiculos) || [])
     setVeiculos(veiculosData || [])
     setLoading(false)
