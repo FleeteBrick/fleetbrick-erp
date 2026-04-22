@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-4">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-white mb-4">Fleet&Brick TEST</h1>
+        <h1 className="text-5xl font-bold text-white mb-4">Fleet&Brick v2</h1>
         <p className="text-xl text-slate-300">Sistema de Gestão de Frotas e Imóveis</p>
       </div>
       <div className="flex gap-4">
