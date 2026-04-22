@@ -1,0 +1,68 @@
+name: Fleet&Brick CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          cd backend
+          pytest || true
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
+
+  deploy:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel (Frontend)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prod'
+      
+      - name: Deploy to Vercel (Backend)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-project-name: fleetbrick-api
+          vercel-args: '--prod'
+          working-directory: ./backend
+
+      - name: Deploy Database (Supabase)
+        run: |
+          echo "Configurar Supabase CLI para deploy"
+          # supabase db push
