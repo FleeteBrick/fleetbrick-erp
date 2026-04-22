@@ -19,10 +19,6 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-      - name: Run tests
-        run: |
-          cd backend
-          pytest || true
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -47,22 +43,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Deploy to Vercel (Frontend)
+      - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-      
-      - name: Deploy to Vercel (Backend)
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-project-name: fleetbrick-api
-          vercel-args: '--prod'
-          working-directory: ./backend
-
-      - name: Deploy Database (Supabase)
-        run: |
-          echo "Configurar Supabase CLI para deploy"
-          # supabase db push

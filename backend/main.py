@@ -1,4 +1,3 @@
-"""Fleet&Brick ERP - FastAPI Application"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -9,11 +8,8 @@ import asyncio
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Gerencia ciclo de vida da aplicação."""
-    # Startup
     print("🚀 Fleet&Brick ERP iniciando...")
     yield
-    # Shutdown
     print("🛑 Fleet&Brick ERP encerrando...")
 
 
@@ -24,16 +20,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://app.fleetbrick.com"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routers
 app.include_router(veiculos.router, prefix="/api", tags=["Veículos"])
 app.include_router(tickets.router, prefix="/api", tags=["Suporte"])
 
@@ -45,8 +39,4 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    return {
-        "message": "Fleet&Brick ERP API",
-        "docs": "/docs",
-        "health": "/health"
-    }
+    return {"message": "Fleet&Brick ERP API", "docs": "/docs", "health": "/health"}
